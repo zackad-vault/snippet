@@ -4,12 +4,12 @@ select nama,
 substring_index(substring_index(koordinat, ',', 1), ',', -1) as lat,
 trim(substr(koordinat, locate(',', koordinat)+1)) as lng,
 koordinat,
-round(get_distance(substring_index(substring_index(koordinat, ',', 1), ',', -1), 
+get_distance(substring_index(substring_index(koordinat, ',', 1), ',', -1), 
 	trim(substr(koordinat, locate(',', koordinat)+1)), 
 	@orig_lat, 
-	@orig_lng), 2) as distance
+	@orig_lng) as distance
 from ci_lokasi
-having distance < 3
+having distance < 3 or distance > 100
 order by distance
-limit 3
+#limit 3
 ;

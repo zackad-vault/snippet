@@ -23,7 +23,7 @@ BEGIN
 	SET dist = dist * 180/pi();
 	SET dist = dist * 60 * 1.1515;
 	SET dist = dist * 1.609344;
-	RETURN dist;
+	RETURN round(dist, 3);
 #	RETURN 6378 * 2 * ASIN(SQRT(
 #	POWER(SIN((lat1 - abs(lat2)) * pi()/180 / 2), 2) + COS(lat1 * pi()/180 ) * COS(abs(lat2) * pi()/180) * 
 #	POWER(SIN((lng1 - lng2) * pi()/180 / 2), 2) ));
