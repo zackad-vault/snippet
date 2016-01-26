@@ -9,7 +9,14 @@ get_distance(substring_index(substring_index(koordinat, ',', 1), ',', -1),
 	@orig_lat, 
 	@orig_lng) as distance
 from ci_lokasi
-having distance < 3 or distance > 100
+having distance < 3
 order by distance
 #limit 3
 ;
+
+# get distance from spatial data
+# please note that y = lattitude, x = longitude
+select astext(orig) as origin, 
+astext(dest) as destination, 
+get_distance(y(orig), x(orig), y(dest), x(dest)) as distance 
+from ci_spatial_test;
