@@ -1,31 +1,35 @@
+-- fungsi untuk mencari jarak terdekat dari satu titik terhadap
+-- kumpulan titik yang menyusun suatu polyline
+-- how to use :
+-- 1. siapkan table untuk menampung hasil kalkulasi (1 column)
+-- 2. truncate table sebelum memanggil fungsi
+-- 
 DELIMITER $$
-DROP FUNCTION IF EXISTS `get_distance`;
-CREATE FUNCTION `get_distance` (lat1 DOUBLE, lng1 DOUBLE, lat2 DOUBLE, lng2 DOUBLE)
-RETURNS DOUBLE
-DETERMINISTIC
+DROP FUNCTION IF EXISTS `calc_distance` $$
+CREATE FUNCTION `calc_distance` (p1 POINT, pline LINESTRING) RETURNS DOUBLE
 BEGIN
-	DECLARE radlat1 DOUBLE;
-	DECLARE radlng1 DOUBLE;
-	DECLARE radlat2 DOUBLE;
-	DECLARE radlng2 DOUBLE;
-	DECLARE theta DOUBLE;
-	DECLARE radtheta DOUBLE;
 	DECLARE dist DOUBLE;
+	DECLARE i INT;
+	DECLARE jum_titik INT;
+	DECLARE temp DOUBLE;
 	
-	SET radlat1 = pi() * lat1/180;
-	SET radlng1 = pi() * lng1/180;
-	SET radlat2 = pi() * lat2/180;
-	SET radlng2 = pi() * lng2/180;
-	SET theta = lng1 - lng2;
-	SET radtheta = pi() * theta/180;
-	SET dist = sin(radlat1) * sin(radlat2) + cos(radlat1) * cos(radlat2) * cos(radtheta);
-	SET dist = acos(dist);
-	SET dist = dist * 180/pi();
-	SET dist = dist * 60 * 1.1515;
-	SET dist = dist * 1.609344;
-	RETURN round(dist, 3);
-#	RETURN 6378 * 2 * ASIN(SQRT(
-#	POWER(SIN((lat1 - abs(lat2)) * pi()/180 / 2), 2) + COS(lat1 * pi()/180 ) * COS(abs(lat2) * pi()/180) * 
-#	POWER(SIN((lng1 - lng2) * pi()/180 / 2), 2) ));
+	SET jum_titik = numpoints(pline);
+	SET i = 1;
+	SET dist = 0;
+	while i < jum_titik do
+		set temp = get_distance(
+				y(p1), 
+				x(p1), 
+				y(pointn(pline, i)), 
+				x(pointn(pline, i))
+			);
+		if(dist < temp or dist = 0) then
+			set dist = temp;
+		end if;
+		set i = i + 1;
+	end while;
+	
+	#set dist = (select min(distance) from ci_distance_temp);
+	RETURN dist;
 END $$
 DELIMITER ;
